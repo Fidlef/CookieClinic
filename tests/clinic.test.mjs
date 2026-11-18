@@ -1,0 +1,5 @@
+import test from "node:test";import assert from "node:assert/strict";import {parseSetCookie,examineCookie} from "../clinic.js";
+test("parses flags and values",()=>{const c=parseSetCookie("sid=x; Secure; SameSite=Lax");assert.equal(c.name,"sid");assert.equal(c.attributes.secure,true);assert.equal(c.attributes.samesite,"Lax");});
+test("detects invalid SameSite None combination",()=>{const r=examineCookie("sid=x; SameSite=None","https");assert.ok(r.findings.some(f=>f.title.includes("requires Secure")));});
+test("enforces Host prefix rules",()=>{const bad=examineCookie("__Host-sid=x; Secure; Domain=example.test; Path=/","https");assert.ok(bad.findings.some(f=>f.title.includes("not satisfied")));const good=examineCookie("__Host-sid=x; Secure; HttpOnly; Path=/; SameSite=Lax","https");assert.ok(good.findings.some(f=>f.title.includes("correctly")));});
+test("local context does not demand Secure",()=>{const r=examineCookie("dev=x; HttpOnly; SameSite=Lax","local");assert.ok(!r.findings.some(f=>f.title==="Secure is missing"));});

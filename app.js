@@ -1,0 +1,4 @@
+import {examineCookie} from "./clinic.js";
+const byId=id=>document.getElementById(id);
+function run(){try{const context=document.querySelector('input[name="context"]:checked').value;const r=examineCookie(byId("cookie").value,context);byId("grade").textContent=r.score;byId("label").textContent=r.label;byId("parsed").textContent=`${r.cookie.name} · ${Object.keys(r.cookie.attributes).length} attributes · ${r.disclaimer}`;byId("findings").replaceChildren(...r.findings.map(f=>{const n=document.createElement("article");n.className=f.severity;const s=document.createElement("strong");s.textContent=f.title;const p=document.createElement("p");p.textContent=f.detail;n.append(s,p);return n;}));}catch(e){byId("parsed").textContent=e.message;}}
+byId("analyze").addEventListener("click",run);byId("demo").addEventListener("click",()=>{byId("cookie").value="__Host-session=synthetic; Domain=example.test; Path=/account; SameSite=None";run();});run();
